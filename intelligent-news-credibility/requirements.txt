@@ -6,3 +6,12 @@ joblib
 requests
 beautifulsoup4
 plotly
+plotly
+langgraph 
+langchain 
+langchain-groq 
+python-dotenv
+langchain-chroma 
+langchain-huggingface 
+sentence-transformers
+datasets<3.0

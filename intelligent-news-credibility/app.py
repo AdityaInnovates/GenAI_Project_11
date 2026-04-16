@@ -8,6 +8,11 @@ import os
 import pickle
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import plotly.figure_factory as ff
+
+# Import the LangGraph agent workflow
+import sys
+sys.path.append(os.path.dirname(__file__))
+from Agent.model import workflow
 st.set_page_config(
     page_title="Intelligent News Credibility Analyzer",
     page_icon="📰",
@@ -190,6 +195,52 @@ It should be used as a **decision-support system**, not a final authority.
                 """
             )
 
+st.markdown("---")
+st.subheader("🕵️‍♂️ Agentic Fact-Checking (RAG + Llama 3.1)")
+st.caption("Validates specific claims against the LIAR fact-checking database using an AI Agent.")
+
+if st.button("Run Agentic Fact-Check"):
+    if not article_text.strip():
+        st.warning("Please provide article text or URL.")
+    else:
+        with st.spinner("🤖 Agent is extracting claims and checking facts... This may take a minute."):
+            try:
+                # Invoke the LangGraph workflow
+                initial_state = {"article_text": article_text}
+                final_state = workflow.invoke(initial_state)
+                
+                claims = final_state.get("extracted_claims", [])
+                retrieval_results = final_state.get("retrieval_results", {})
+                final_report = final_state.get("final_report", "No report generated.")
+                
+                st.success("Analysis Complete!")
+                
+                # Show extracted claims
+                with st.expander("📋 Extracted Factual Claims", expanded=True):
+                    if not claims:
+                        st.info("No verifiable factual claims were extracted.")
+                    else:
+                        for c in claims:
+                            st.write(f"- **{c.entity}**: {c.claim}")
+                            
+                # Show RAG Evidence
+                with st.expander("📚 Retrieved Evidence from Vector DB", expanded=False):
+                    for claim, evidence in retrieval_results.items():
+                        st.markdown(f"**Claim:** {claim}")
+                        if "NO VERIFIED EVIDENCE FOUND" in evidence:
+                            st.warning(evidence)
+                        else:
+                            st.success("Evidence found in database!")
+                            st.text(evidence[:500] + "..." if len(evidence) > 500 else evidence)
+                        st.divider()
+                
+                # Show Final Report
+                st.subheader("📝 Final Credibility Report")
+                st.markdown(final_report)
+                
+            except Exception as e:
+                st.error(f"Failed to run agentic analysis: {e}")
+
 # ---------------- FOOTER ----------------
 st.markdown("---")
-st.caption("Academic Project | NLP & ML | Deployed via Streamlit")
+st.caption("Academic Project | NLP & ML & Generative AI | Deployed via Streamlit")

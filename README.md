@@ -2,10 +2,10 @@
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange.svg)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agents-purple.svg)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Deployment-red.svg)
-![Accuracy](https://img.shields.io/badge/Accuracy-98%25-brightgreen.svg)
 
-A machine learning-based news credibility classification system that leverages classical NLP techniques and Logistic Regression to distinguish between fake and real news articles with approximately **98% accuracy**.
+A dual-engine news credibility system that combines **Classical Machine Learning (NLP + Logistic Regression)** with an **Agentic AI Fact-Checking Pipeline (Llama 3.1 + RAG)**. It seamlessly evaluates textual metadata for credibility while deploying an autonomous agent against the PolitiFact `LIAR` dataset to cross-reference and verify explicit claims without generating AI hallucinations.
 
 ---
 
@@ -45,14 +45,16 @@ With billions of people consuming news online daily, distinguishing credible jou
 
 ### Approach
 
-Unlike complex deep learning or LLM-based approaches, this project uses:
+This application supports two distinct pipelines designed to process news data comprehensively:
 
-- **Classical Machine Learning**: Logistic Regression for interpretability and efficiency
-- **TF-IDF Vectorization**: Capturing linguistic patterns and word importance
-- **Binary Classification**: Simple yet effective fake (0) vs real (1) labeling
-- **No External APIs**: Fully offline, fast, and cost-effective inference
+**Phase 1: Classical Machine Learning**
+- **TF-IDF Vectorization** and **Logistic Regression** for fast, local binary classification (Fake vs. Real).
+- Prioritizes **explainability**, **speed**, and **resource efficiency** without reliance on external APIs.
 
-This approach prioritizes **explainability**, **speed**, and **resource efficiency** while maintaining high accuracy.
+**Phase 2: RAG-based Agentic Fact-Checking**
+- **LangGraph** orchestration managing a multi-node Llama-3.1-8B LLM.
+- **ChromaDB** persistent vector store actively querying the `LIAR` fact-checking dataset. 
+- **Graceful Degradation** mechanism to identify unverified quotes rather than producing AI hallucinations.
 
 ---
 
@@ -81,9 +83,14 @@ This approach prioritizes **explainability**, **speed**, and **resource efficien
    - Explanation of decision-making process
    - Clear indication of methods used (TF-IDF + Logistic Regression)
 
-6. **⚖️ Ethical Disclaimer**
-   - Responsible AI messaging
-   - Emphasizes tool as decision-support, not absolute truth
+6. **🕵️‍♂️ Agentic Fact-Checking (Llama 3.1)**
+   - Autonomously extracts verifiable atomic claims from input.
+   - Embeds semantics and fetches matches against local truth datasets (PolitiFact `LIAR`).
+   - Produces detailed credibility reports pointing exactly to corroborating evidence.
+
+7. **⚖️ Ethical Disclaimer**
+   - Responsible AI messaging.
+   - Safely isolates "Unverified historical data" from deterministic falsity.
 
 ---
 
@@ -99,13 +106,17 @@ This approach prioritizes **explainability**, **speed**, and **resource efficien
 | **Pandas**       | Data manipulation            | Latest  |
 | **NumPy**        | Numerical computing          | Latest  |
 
+| **LangGraph/LangChain**| Orchestration of LLM nodes and prompts| Latest |
+| **ChromaDB**     | Fast local vector database for RAG  | Latest  |
+| **Groq API**     | Lightning-fast Llama-3.1 inference  | - |
+
 ### NLP & ML Components
 
 | Component               | Description                  |
 | ----------------------- | ---------------------------- |
 | **TF-IDF Vectorizer**   | Feature extraction from text |
 | **Logistic Regression** | Binary classification model  |
-| **Stopwords Removal**   | NLTK English stopwords       |
+| **HuggingFace MiniLM**  | Vector embedding generation  |
 | **N-gram Analysis**     | Unigrams + Bigrams (1,2)     |
 
 ### Web & Deployment
@@ -115,7 +126,7 @@ This approach prioritizes **explainability**, **speed**, and **resource efficien
 | **Streamlit**      | Interactive web application framework |
 | **BeautifulSoup4** | HTML parsing for URL extraction       |
 | **Requests**       | HTTP requests for web scraping        |
-| **Joblib**         | Model serialization                   |
+| **Joblib / Pickle**| Model and Database serialization      |
 
 ---
 
@@ -461,47 +472,17 @@ https://yourusername-intelligent-news-credibility-app-xxxxx.streamlit.app
 
 ## 🔮 Future Improvements
 
-### Milestone 2: Agentic AI Integration
-
-#### 1. **Retrieval-Augmented Generation (RAG)**
-
-- Integrate vector database (e.g., Pinecone, Weaviate)
-- Retrieve fact-check articles from trusted sources
-- Cross-reference claims with verified databases
-
-#### 2. **Multi-Agent System**
-
-```
-Agent 1: Content Analyzer
-  ↓
-Agent 2: Fact Checker (RAG)
-  ↓
-Agent 3: Source Credibility Assessor
-  ↓
-Agent 4: Report Generator
-```
-
-#### 3. **Structured Credibility Reports**
-
-- **Claim Extraction**: Identify key claims in article
-- **Evidence Retrieval**: Find supporting/contradicting evidence
-- **Source Verification**: Check publisher reputation
-- **Temporal Analysis**: Verify event timelines
-- **Bias Detection**: Identify loaded language
-
-#### 4. **Advanced Features**
+### 1. **Advanced Analysis Features**
 
 - **Multi-lingual Support**: Detect fake news in multiple languages
 - **Image Verification**: Reverse image search for manipulated photos
 - **Social Media Analysis**: Track viral spread patterns
-- **User Feedback Loop**: Continuous model improvement
-- **API Endpoints**: Enable integration with other platforms
 
-#### 5. **Performance Enhancements**
+### 2. **System Enhancements**
 
-- **Deep Learning Models**: BERT, RoBERTa for contextual understanding
-- **Ensemble Methods**: Combine multiple models for robustness
-- **Explainable AI**: SHAP/LIME for prediction explanations
+- **Deep Learning Models**: BERT, RoBERTa for contextual understanding of the classical ML Phase.
+- **Web-scraping Integration**: Automatically fetching real-time fact checks natively for the LLM.
+- **User Feedback Loop**: Continuous model improvement tracking. 
 
 ---
 
