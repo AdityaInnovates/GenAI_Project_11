@@ -35,3 +35,4 @@ python-dotenv>=1.0
 tavily-python>=0.7
 aiohttp>=3.9
 langchain_groq
+langchain_huggingface
