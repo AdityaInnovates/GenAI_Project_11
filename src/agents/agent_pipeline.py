@@ -33,7 +33,7 @@ from typing import TypedDict, List, Dict
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import StateGraph
 from langchain_groq import ChatGroq
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -326,10 +326,14 @@ graph.add_node("retrieve_facts_node", retrieve_facts_node)
 graph.add_node("generate_assessment_node", generate_assessment_node)
 
 # --- Wire the edges (sequential pipeline) ---
-graph.add_edge(START, "extract_claims_node")
+graph.set_entry_point("extract_claims_node")
+
+# FLOW
 graph.add_edge("extract_claims_node", "retrieve_facts_node")
 graph.add_edge("retrieve_facts_node", "generate_assessment_node")
-graph.add_edge("generate_assessment_node", END)
+
+# END POINT
+graph.set_finish_point("generate_assessment_node")
 
 # --- Compile the graph into a runnable workflow ---
 workflow = graph.compile()
