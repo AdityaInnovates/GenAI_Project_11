@@ -1,6 +1,6 @@
 # 📰 Intelligent News Credibility Analyzer
 
-![System Architecture](docs/system_architechture_genAI11.png)
+![System Architecture](docs/System_architechture.png)
 
 A hybrid Machine Learning and Agentic AI system that analyzes news articles to assess their credibility. It uses classical NLP/ML techniques for probabilistic classification and a Retrieval-Augmented Generation (RAG) agent for deterministic fact-checking against the verified LIAR dataset.
 
