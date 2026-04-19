@@ -164,6 +164,4 @@ cython_debug/
 # Custom data ignores for this project
 data/raw/*
 data/chroma_db/*
-src/ml/models/*.pkl
-src/ml/data/*.pkl
 !data/.gitkeep
