@@ -1,1 +1,105 @@
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Large datasets (if any)
+data/raw/
+data/processed/
+
+# Model files (if large)
+models/
+checkpoints/
+
+# Jupyter kernel
+.ipynb_checkpoints/
+
+# Other common ignores
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.cache
+*.egg-info
+.venv
+env
+venv
+
+# Specific to this project
+.env
+.env.local
+.env.*.local
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+tmp/
+temp/
+*.tmp
+data/raw/
+data/processed/
+models/
+checkpoints/
+    

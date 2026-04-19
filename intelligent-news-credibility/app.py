@@ -195,14 +195,10 @@ It should be used as a **decision-support system**, not a final authority.
                 """
             )
 
-st.markdown("---")
-st.subheader("🕵️‍♂️ Agentic Fact-Checking (RAG + Llama 3.1)")
-st.caption("Validates specific claims against the LIAR fact-checking database using an AI Agent.")
-
-if st.button("Run Agentic Fact-Check"):
-    if not article_text.strip():
-        st.warning("Please provide article text or URL.")
-    else:
+        st.markdown("---")
+        st.subheader("🕵️‍♂️ Agentic Fact-Checking (Tavily Search + Llama 3.1)")
+        st.caption("Validates specific claims dynamically across the web using Tavily Search.")
+        
         with st.spinner("🤖 Agent is extracting claims and checking facts... This may take a minute."):
             try:
                 # Invoke the LangGraph workflow
@@ -224,7 +220,7 @@ if st.button("Run Agentic Fact-Check"):
                             st.write(f"- **{c.entity}**: {c.claim}")
                             
                 # Show RAG Evidence
-                with st.expander("📚 Retrieved Evidence from Vector DB", expanded=False):
+                with st.expander("🌐 Retrieved Evidence from Web Search", expanded=False):
                     for claim, evidence in retrieval_results.items():
                         st.markdown(f"**Claim:** {claim}")
                         if "NO VERIFIED EVIDENCE FOUND" in evidence:
