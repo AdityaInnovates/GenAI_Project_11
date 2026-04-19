@@ -15,3 +15,5 @@ langchain-chroma
 langchain-huggingface 
 sentence-transformers
 datasets<3.0
+tavily-python
+langchain-community

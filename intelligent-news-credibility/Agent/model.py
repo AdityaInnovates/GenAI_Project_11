@@ -35,8 +35,7 @@ from pydantic import BaseModel, Field
 
 from langgraph.graph import StateGraph, START, END
 from langchain_groq import ChatGroq
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+from langchain_community.tools.tavily_search import TavilySearchResults
 
 load_dotenv()
 
@@ -75,40 +74,11 @@ structured_llm = llm.with_structured_output(ClaimsOutput)
 
 
 # ==============================================================================
-# SECTION 3: ChromaDB Vector Store & Retriever Initialization
+# SECTION 3: Tavily Web Search Tool Initialization
 # ==============================================================================
 
-
-CHROMA_DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
-
-# --- Embedding Model ---
-embedding_function = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-# --- Load the persistent Chroma vector store ---
-vectorstore = Chroma(
-    persist_directory=CHROMA_DB_DIR,
-    embedding_function=embedding_function,
-    collection_name="liar_fact_checks",  
-)
-
-# --- Configure the Retriever with a Similarity Score Threshold ---
-# search_type="similarity_score_threshold" ensures we only return documents
-# whose cosine similarity score is >= the threshold.
-#
-# Parameters:
-#   k=3            → Return at most 3 matching documents per query
-#   score_threshold=0.5 → Only return docs with similarity >= 0.5
-retriever = vectorstore.as_retriever(
-    search_type="similarity_score_threshold",
-    search_kwargs={
-        "k": 3,
-        "score_threshold": 0.5,
-    },
-)
+# Uses TAVILY_API_KEY from environment internally
+retriever = TavilySearchResults(max_results=3)
 
 
 # ==============================================================================
@@ -167,7 +137,7 @@ RULES:
 
 # --- Sentinel string for unverified claims ---
 # This exact string is checked by the assessment prompt to prevent hallucination.
-NO_EVIDENCE_SENTINEL = "NO VERIFIED EVIDENCE FOUND IN DATABASE."
+NO_EVIDENCE_SENTINEL = "NO VERIFIED EVIDENCE FOUND IN WEB SEARCH."
 
 
 def retrieve_facts_node(state: AgentState) -> AgentState:
@@ -184,7 +154,7 @@ def retrieve_facts_node(state: AgentState) -> AgentState:
          b) NO MATCH (empty list returned):
             - The similarity score of all documents was below 0.5
             - We map this claim to the sentinel string:
-              "NO VERIFIED EVIDENCE FOUND IN DATABASE."
+              "NO VERIFIED EVIDENCE FOUND IN WEB SEARCH."
             - This is CRITICAL: it tells Node 3 NOT to hallucinate.
 
     WHY THIS MATTERS:
@@ -250,8 +220,8 @@ def generate_assessment_node(state: AgentState) -> AgentState:
 
     ANTI-HALLUCINATION STRATEGY:
       The system prompt contains an explicit instruction:
-        "If the retrieved evidence says 'NO VERIFIED EVIDENCE FOUND IN DATABASE.',
-         you MUST state that the claim is 'Unverified due to lack of historical data'."
+        "If the retrieved evidence says 'NO VERIFIED EVIDENCE FOUND IN WEB SEARCH.',
+         you MUST state that the claim is 'Unverified due to lack of web evidence'."
 
       This prevents the LLM from:
         - Inventing fake sources or citations
@@ -289,8 +259,8 @@ def generate_assessment_node(state: AgentState) -> AgentState:
 STRICT RULES — YOU MUST FOLLOW THESE WITHOUT EXCEPTION:
 
 1. For each claim, analyze ONLY the retrieved evidence provided below.
-2. If the retrieved evidence for a claim says 'NO VERIFIED EVIDENCE FOUND IN DATABASE.', 
-   you MUST state in your Verdict that the claim is 'Unverified due to lack of historical data'. 
+2. If the retrieved evidence for a claim says 'NO VERIFIED EVIDENCE FOUND IN WEB SEARCH.', 
+   you MUST state in your Verdict that the claim is 'Unverified due to lack of web evidence'. 
    DO NOT invent facts, guess, or use baseline knowledge to verify the claim.
 3. DO NOT fabricate sources, citations, URLs, or fact-check results.
 4. If evidence IS found, compare the claim against the evidence and give your verdict 
